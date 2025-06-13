@@ -5,7 +5,11 @@ class UserRepository {
     async getAll(page:number, pageSize:number, isDeleted:boolean) {
         const skip = (page - 1) * pageSize;
         const take = pageSize;
-        return prisma.user.findMany({ where: { isDeleted }, skip, take, orderBy: { createdAt: 'desc' } })
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({ where: { isDeleted }, skip, take, orderBy: { createdAt: 'desc' } }),
+            prisma.user.count({ where: {isDeleted}})
+        ])
+        return {users, total};
     }
 
     async getByid(id:number) {

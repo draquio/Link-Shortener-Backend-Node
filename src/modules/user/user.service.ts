@@ -3,16 +3,17 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from "./user.dto";
 import { DtoCreateToUser, UserListToDTOs, UserToDTO } from "./user.mapper";
 import userRespository from "./user.respository";
 import { hashPassword } from "@/utils/hash";
+import { NotFoundError } from "@/errors/NotFoundError";
 
 class UserService {
   async getAll(page: number, pageSize: number, isDeleted: boolean) {
-    const users = await userRespository.getAll(page, pageSize, isDeleted);
-    return UserListToDTOs(users);
+    const data = await userRespository.getAll(page, pageSize, isDeleted);
+    return {data: UserListToDTOs(data.users), total: data.total}
   }
 
   async getById(id: number) {
     const user = await userRespository.getByid(id);
-    if (!user) throw new Error("User not found");
+    if (!user) throw new NotFoundError("User", id);
     return UserToDTO(user);
   }
 

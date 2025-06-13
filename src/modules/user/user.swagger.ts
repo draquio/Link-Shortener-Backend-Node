@@ -23,9 +23,7 @@ export const userSwagger = {
         },
       ],
       responses: {
-        200: {
-          description: 'A list of users.',
-        },
+        200: { description: 'A list of users.' },
       },
     },
 
@@ -52,12 +50,32 @@ export const userSwagger = {
         500: { description: 'Internal server error' },
       },
     },
+  },
+
+  '/api/v1/users/{id}': {
+    get: {
+      summary: 'Get user by ID',
+      parameters: [
+        {
+          in: 'path',
+          name: 'id',
+          required: true,
+          schema: { type: 'integer' },
+          description: 'ID of the user',
+        },
+      ],
+      responses: {
+        200: { description: 'A single user object' },
+        404: { description: 'User not found' },
+        500: { description: 'Internal server error' },
+      },
+    },
 
     put: {
       summary: 'Update a user',
       parameters: [
         {
-          in: 'query',
+          in: 'path',
           name: 'id',
           required: true,
           schema: { type: 'integer' },
@@ -87,11 +105,43 @@ export const userSwagger = {
       },
     },
 
+    patch: {
+      summary: 'Set a new user password',
+      parameters: [
+        {
+          in: 'path',
+          name: 'id',
+          required: true,
+          schema: { type: 'integer' },
+          description: 'ID of the user to set new password',
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                password: { type: 'string', example: 'newpassword' },
+                repeatPassword: { type: 'string', example: 'repeatPassword' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: { description: 'Password updated successfully' },
+        404: { description: 'User not found' },
+        500: { description: 'Internal server error' },
+      },
+    },
+
     delete: {
       summary: 'Delete a user (soft delete)',
       parameters: [
         {
-          in: 'query',
+          in: 'path',
           name: 'id',
           required: true,
           schema: { type: 'integer' },
@@ -100,26 +150,6 @@ export const userSwagger = {
       ],
       responses: {
         204: { description: 'User deleted successfully' },
-        404: { description: 'User not found' },
-        500: { description: 'Internal server error' },
-      },
-    },
-  },
-
-  '/api/v1/users/id': {
-    get: {
-      summary: 'Get user by ID',
-      parameters: [
-        {
-          in: 'query',
-          name: 'id',
-          required: true,
-          schema: { type: 'integer' },
-          description: 'ID of the user',
-        },
-      ],
-      responses: {
-        200: { description: 'A single user object' },
         404: { description: 'User not found' },
         500: { description: 'Internal server error' },
       },

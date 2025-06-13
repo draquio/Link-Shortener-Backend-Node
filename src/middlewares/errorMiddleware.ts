@@ -2,6 +2,7 @@ import { NotFoundError } from "@/errors/NotFoundError";
 import { ValidationError } from "@/errors/ValidationError";
 import { ResponseHelper } from "@/helpers/responseHelper";
 import { ErrorRequestHandler } from "express";
+import { ZodError } from "zod";
 
 export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
     if(err instanceof SyntaxError && "body" in err){
@@ -9,6 +10,18 @@ export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
         res.status(400).json(response);
         return;
     }
+
+    if (err instanceof ZodError) {
+        const errors = err.errors.reduce((acc: Record<string, string>, curr) => {
+        const path = curr.path.join(".");
+        acc[path] = curr.message;
+        return acc;
+    }, {});
+
+    const response = ResponseHelper.error("Validation failed", errors);
+    res.status(400).json(response);
+    return;
+  }
 
     if (err instanceof ValidationError) {
         const response = ResponseHelper.error(err.message);

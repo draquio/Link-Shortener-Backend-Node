@@ -2,6 +2,7 @@ import { NotFoundError } from "@/errors/NotFoundError";
 import { UnauthorizedError } from "@/errors/UnauthorizedError";
 import { ValidationError } from "@/errors/ValidationError";
 import { ResponseHelper } from "@/helpers/responseHelper";
+import { Prisma } from "@prisma/client";
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 
@@ -42,6 +43,16 @@ export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
         return;
     }
 
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (err.code) {
+            case "P2002":
+            res.status(400).json(ResponseHelper.error("Email or username already exists"));
+            return;
+            case "P2025":
+            res.status(404).json(ResponseHelper.error("Resource not found"));
+            return; 
+        }
+    }   
     const response = ResponseHelper.error("Internal server error");
     res.status(500).json(response);
 }

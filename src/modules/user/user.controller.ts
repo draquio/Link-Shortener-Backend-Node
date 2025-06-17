@@ -2,7 +2,7 @@ import { Pagination } from "@/types/Responses";
 import { Request, Response } from "express";
 import { ResponseHelper } from "@/helpers/responseHelper";
 import { IdValidator } from "@/validators/id.validator";
-import { UserCreateSchema, UserSetNewPasswordSchema, UserUpdateSchema } from "./user.dto";
+import { UserCreateDTO, UserSetNewPasswordDTO, UserUpdateDTO } from "./user.dto";
 import { PaginationValidator } from "@/validators/pagination.validator";
 import { UserService } from "./user.service";
 
@@ -10,6 +10,7 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private readonly userService:UserService){}
 
+  
   async getAll(req: Request, res: Response) {
     const { page, pageSize } = PaginationValidator.parse(req.query);
     const isDeleted = req.query.isDeleted === "true";
@@ -29,7 +30,7 @@ export class UserController {
   }
 
   async create(req: Request, res: Response) {
-    const userCreateDTO = UserCreateSchema.parse(req.body);
+    const userCreateDTO = req.body satisfies UserCreateDTO;
     const user = await this.userService.create(userCreateDTO);
     const response = ResponseHelper.success(user, "User created successfully")
     res.status(201).json(response);
@@ -37,7 +38,7 @@ export class UserController {
 
   async update(req: Request, res: Response) {
     const { id } = IdValidator.parse(req.params);
-    const userUpdateDTO = UserUpdateSchema.parse(req.body);
+    const userUpdateDTO = req.body satisfies UserUpdateDTO;
     const user = await this.userService.update(id, userUpdateDTO);
     const response = ResponseHelper.success(user, "User updated successfully");
     res.json(response);
@@ -50,7 +51,7 @@ export class UserController {
 
   async setNewPassword(req: Request, res: Response) {
     const { id } = IdValidator.parse(req.params);
-    const { password } = UserSetNewPasswordSchema.parse(req.body);
+    const { password } = req.body satisfies UserSetNewPasswordDTO;
     console.log(id, password);
     
     const user = await this.userService.setNewPassword(id, password);

@@ -1,6 +1,7 @@
 export const userSwagger = {
   '/api/v1/users': {
     get: {
+      tags: ['Users'],
       summary: 'Get all users',
       parameters: [
         {
@@ -28,6 +29,7 @@ export const userSwagger = {
     },
 
     post: {
+      tags: ['Users'],
       summary: 'Create a new user',
       requestBody: {
         required: true,
@@ -54,6 +56,7 @@ export const userSwagger = {
 
   '/api/v1/users/{id}': {
     get: {
+      tags: ['Users'],
       summary: 'Get user by ID',
       parameters: [
         {
@@ -72,6 +75,7 @@ export const userSwagger = {
     },
 
     put: {
+      tags: ['Users'],
       summary: 'Update a user',
       parameters: [
         {
@@ -106,6 +110,7 @@ export const userSwagger = {
     },
 
     patch: {
+      tags: ['Users'],
       summary: 'Set a new user password',
       parameters: [
         {
@@ -138,6 +143,7 @@ export const userSwagger = {
     },
 
     delete: {
+      tags: ['Users'],
       summary: 'Delete a user (soft delete)',
       parameters: [
         {

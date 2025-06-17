@@ -1,4 +1,5 @@
 import { NotFoundError } from "@/errors/NotFoundError";
+import { UnauthorizedError } from "@/errors/UnauthorizedError";
 import { ValidationError } from "@/errors/ValidationError";
 import { ResponseHelper } from "@/helpers/responseHelper";
 import { ErrorRequestHandler } from "express";
@@ -32,6 +33,12 @@ export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
     if(err instanceof NotFoundError){
         const response = ResponseHelper.error(err.message);
         res.status(404).json(response);
+        return;
+    }
+
+    if(err instanceof UnauthorizedError){
+        const response = ResponseHelper.error(err.message);
+        res.status(401).json(response);
         return;
     }
 

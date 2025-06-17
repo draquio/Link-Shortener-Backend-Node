@@ -1,6 +1,7 @@
 import { prisma } from "@/config/prismaClient"
 import { Prisma } from "@prisma/client";
-class UserRepository {
+
+export class UserRepository {
     async getAll(page:number, pageSize:number, isDeleted:boolean) {
         const skip = (page - 1) * pageSize;
         const take = pageSize;
@@ -11,8 +12,11 @@ class UserRepository {
         return {users, total};
     }
 
-    async getByid(id:number) {
+    async getById(id:number) {
         return prisma.user.findUnique({ where: { id }})
+    }
+    async getByEmail(email:string) {
+        return prisma.user.findUnique({ where: { email }})
     }
     async create(data:Prisma.UserCreateInput){
         return prisma.user.create({ data })
@@ -30,5 +34,3 @@ class UserRepository {
         })
     }
 }
-
-export default new UserRepository();

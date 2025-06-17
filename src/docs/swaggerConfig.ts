@@ -1,5 +1,6 @@
 import { ENV } from "@/utils/constants";
 import { userSwagger } from "@/modules/user/user.swagger";
+import { authSwagger } from "@/modules/auth/auth.swagger";
 const PORT = ENV.PORT;
 
 export const swaggerSpec = {
@@ -16,5 +17,6 @@ export const swaggerSpec = {
   ],
   paths: {
     ...userSwagger,
+    ...authSwagger
   },
 };

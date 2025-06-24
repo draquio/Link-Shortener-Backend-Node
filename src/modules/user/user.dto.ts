@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { z } from "zod";
 
 export interface UserResponseDTO {
@@ -11,7 +12,7 @@ export interface UserResponseDTO {
   membershipId?: number;
 }
 
-
+export type UserUpdatableFields = Pick<User, "email" | "username" | "isActive" | "membershipId">;
 
 
 export const UserCreateSchema = z.object({

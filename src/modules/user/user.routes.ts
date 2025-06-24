@@ -1,6 +1,6 @@
-import {Router} from "express"
+import { Router } from "express"
 import { userController } from "./user.instance";
-import { validateBody } from "@/middlewares/validateBody";
+import { validateBody } from "@/middlewares/validateBody.middleware";
 import { UserCreateSchema, UserSetNewPasswordSchema, UserUpdateSchema } from "./user.dto";
 
 const router = Router();

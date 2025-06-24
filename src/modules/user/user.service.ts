@@ -1,33 +1,34 @@
-import { UserCreateDTO, UserUpdateDTO } from "./user.dto";
+import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from "./user.dto";
 import { hashPassword } from "@/utils/hash";
 import { NotFoundError } from "@/errors/NotFoundError";
 import { UserMapper } from "./user.mapper";
 import { UserRepository } from "./user.respository";
 
+
+type GetUsersAndTotal = { users: UserResponseDTO[]; total: number };
+
 export class UserService {
   constructor(private readonly userRepository:UserRepository){}
 
-  async getAll(page: number, pageSize: number, isDeleted: boolean) {
+  async getAll(page: number, pageSize: number, isDeleted: boolean): Promise<GetUsersAndTotal> {
     const data = await this.userRepository.getAll(page, pageSize, isDeleted);
-    return {data: UserMapper.toDTOList(data.users), total: data.total}
+    return {users: UserMapper.toDTOList(data.users), total: data.total}
   }
 
-  async getById(id: number) {
+  async getById(id: number): Promise<UserResponseDTO> {
     const user = await this.userRepository.getById(id);
     if (!user) throw new NotFoundError("User", id);
     return UserMapper.toDTO(user);
   }
 
-  async create(data: UserCreateDTO) {
+  async create(data: UserCreateDTO): Promise<UserResponseDTO> {
     const hashedPassword = await hashPassword(data.password);
-    data.password = hashedPassword;
-    data.isActive = true;
-    const userEntity = UserMapper.toEntityFromCreate(data);
+    const userEntity = UserMapper.toEntityFromCreate({...data, password: hashedPassword, isActive: true});
     const userCreated = await this.userRepository.create(userEntity);
     return UserMapper.toDTO(userCreated);
   }
 
-  async update(id: number, data: UserUpdateDTO) {
+  async update(id: number, data: UserUpdateDTO): Promise<UserResponseDTO> {
     const userExist = await this.userRepository.getById(id);
     if (!userExist) throw new NotFoundError("User", id);
     const userEntity = UserMapper.toEntityFromUpdate(data)
@@ -35,16 +36,16 @@ export class UserService {
     return UserMapper.toDTO(userUpdated);
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<void> {
     const user = await this.userRepository.getById(id);
     if (!user) throw new NotFoundError("User", id);
     await this.userRepository.softDelete(id);
   }
 
-  async setNewPassword(id:number, password:string){
+  async setNewPassword(id:number, password:string): Promise<void> {
     const user = await this.userRepository.getById(id);
     if (!user) throw new NotFoundError("User", id);
     const hashedPassword = await hashPassword(password);
-    await this.userRepository.update(id, { password:hashedPassword });
+    await this.userRepository.updatePassword(id, hashedPassword);
   }
 }

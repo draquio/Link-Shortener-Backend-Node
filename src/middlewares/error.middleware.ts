@@ -1,3 +1,4 @@
+import { BadRequestError } from "@/errors/BadRequestError";
 import { NotFoundError } from "@/errors/NotFoundError";
 import { UnauthorizedError } from "@/errors/UnauthorizedError";
 import { ValidationError } from "@/errors/ValidationError";
@@ -40,6 +41,12 @@ export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
     if(err instanceof UnauthorizedError){
         const response = ResponseHelper.error(err.message);
         res.status(401).json(response);
+        return;
+    }
+
+    if (err instanceof BadRequestError) {
+        const response = ResponseHelper.error(err.message);
+        res.status(400).json(response);
         return;
     }
 

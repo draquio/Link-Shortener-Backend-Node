@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -11,4 +13,12 @@ export interface Pagination {
   pageSize: number;
   totalResults?: number;
   totalPages?: number;
+}
+
+
+export interface RequestWithUser extends Request {
+  user: {
+    userId: number;
+    email: string;
+  };
 }

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,63 +8,75 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique
-  email String @unique
-  password String
-  isActive Boolean @default(false)
-  isDeleted Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  membershipId Int?
-
-  links Link[]
+  id                 Int                 @id @default(autoincrement())
+  email              String              @unique
+  password           String
+  isActive           Boolean             @default(false)
+  isDeleted          Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  membershipId       Int?
+  username           String              @unique
+  links              Link[]
+  loginHistories     LoginHistory[]
+  RefreshToken       RefreshToken[]
   verificationTokens VerificationToken[]
-  loginHistories LoginHistory[]
 }
 
 model Link {
-  id Int @id @default(autoincrement())
-  userId Int
-  originalUrl String
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  originalUrl       String
   advertisementLink String?
-  shortCode String @unique
-  createdAt DateTime @default(now())
-  expirationDate DateTime?
-  isActive Boolean @default(true)
-
-  user User @relation(fields: [userId], references: [id])
-  visits Visit[]
+  shortCode         String    @unique
+  createdAt         DateTime  @default(now())
+  expirationDate    DateTime?
+  isActive          Boolean   @default(true)
+  user              User      @relation(fields: [userId], references: [id])
+  visits            Visit[]
 }
 
 model Visit {
-  id Int @id @default(autoincrement())
-  linkId Int
+  id        Int      @id @default(autoincrement())
+  linkId    Int
   visitDate DateTime @default(now())
-  ip String?
+  ip        String?
   userAgent String?
-  referrer String?
-  country String?
-
-  link Link @relation(fields: [linkId], references: [id])
+  referrer  String?
+  country   String?
+  link      Link     @relation(fields: [linkId], references: [id])
 }
 
 model VerificationToken {
-  id Int @id @default(autoincrement())
-  userId Int
-  token String
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  token          String
   expirationDate DateTime
-  isUsed Boolean @default(false)
+  isUsed         Boolean   @default(false)
+  type           TokenType
+  user           User      @relation(fields: [userId], references: [id])
+}
 
-  user User @relation(fields: [userId], references: [id])
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model LoginHistory {
-  id Int @id @default(autoincrement())
-  userId Int
+  id        Int      @id @default(autoincrement())
+  userId    Int
   loginDate DateTime @default(now())
-  ip String?
+  ip        String?
   userAgent String?
+  user      User     @relation(fields: [userId], references: [id])
+}
 
-  user User @relation(fields: [userId], references: [id])
+enum TokenType {
+  EMAIL_VERIFICATION
+  RESET_PASSWORD
 }

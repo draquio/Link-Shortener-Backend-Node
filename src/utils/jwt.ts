@@ -12,3 +12,17 @@ export const generateAccessToken = (payload: object): string => {
 export const generateRefreshToken = (payload: object): string => {
   return jwt.sign(payload, jwtSecret, refreshTokenOptions as SignOptions);
 };
+
+export const generateEmailVerificationToken = (payload: object): string => {
+  const options: SignOptions = { expiresIn: "30d" };
+  return jwt.sign(payload, jwtSecret, options);
+};
+
+
+export const verifyToken = <T = any>(token: string): T => {
+  try {
+    return jwt.verify(token, jwtSecret) as T;
+  } catch (err) {
+    throw new Error("Invalid or expired token");
+  }
+};

@@ -1,6 +1,6 @@
 export class UnauthorizedError extends Error {
-  constructor(message = "Invalid credentials") {
+  constructor(message: string = "Invalid credentials") {
     super(message);
-    this.name = "UnauthorizedError";
+    this.name = "Unauthorized Error";
   }
 }

@@ -15,18 +15,18 @@ export class UserController {
     const { page, pageSize } = PaginationValidator.parse(req.query);
     const isDeleted = req.query.isDeleted === "true";
 
-    const {data, total} = await this.userService.getAll(page, pageSize, isDeleted);
+    const {users, total} = await this.userService.getAll(page, pageSize, isDeleted);
     const totalPages = Math.ceil(total / pageSize);
     const pagination: Pagination = { page, pageSize, totalResults: total, totalPages };
-    const response = ResponseHelper.success(data, "Users retrieved successfully", pagination)
-    res.json(response);
+    const response = ResponseHelper.success(users, "Users retrieved successfully", pagination)
+    res.status(200).json(response);
   }
 
   async getById(req: Request, res: Response) {
-    const { id } = IdValidator.parse(req.params);
+    const id = IdValidator.parse(req.params.id);
     const user = await this.userService.getById(id);
     const response = ResponseHelper.success(user, "User retrieved successfully")
-    res.json(response);
+    res.status(200).json(response);
   }
 
   async create(req: Request, res: Response) {
@@ -37,25 +37,25 @@ export class UserController {
   }
 
   async update(req: Request, res: Response) {
-    const { id } = IdValidator.parse(req.params);
+    const id = IdValidator.parse(req.params.id);
     const userUpdateDTO = req.body satisfies UserUpdateDTO;
     const user = await this.userService.update(id, userUpdateDTO);
     const response = ResponseHelper.success(user, "User updated successfully");
-    res.json(response);
+    res.status(200).json(response);
   }
   async delete(req: Request, res: Response) {
-    const { id } = IdValidator.parse(req.params);
+    const id = IdValidator.parse(req.params.id);
     await this.userService.delete(id);
     res.status(204).send();
   }
 
   async setNewPassword(req: Request, res: Response) {
-    const { id } = IdValidator.parse(req.params);
+    const id = IdValidator.parse(req.params.id);
     const { password } = req.body satisfies UserSetNewPasswordDTO;
     console.log(id, password);
     
     const user = await this.userService.setNewPassword(id, password);
     const response = ResponseHelper.success(user, "Password updated successfully"); 
-    res.json(response);
+    res.status(200).json(response);
   }
 }

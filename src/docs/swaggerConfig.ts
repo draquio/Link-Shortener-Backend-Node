@@ -1,6 +1,7 @@
 import { ENV } from "@/utils/constants";
 import { userSwagger } from "@/modules/user/user.swagger";
 import { authSwagger } from "@/modules/auth/auth.swagger";
+import { linkSwagger } from "@/modules/link/link.swagger";
 const PORT = ENV.PORT;
 
 export const swaggerSpec = {
@@ -15,8 +16,24 @@ export const swaggerSpec = {
       url: `http://localhost:${PORT}`,
     },
   ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
+
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   paths: {
+    ...linkSwagger,
+    ...authSwagger,
     ...userSwagger,
-    ...authSwagger
   },
 };

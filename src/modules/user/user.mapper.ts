@@ -1,3 +1,5 @@
+import { RegisterDTO } from "../auth/auth.dto";
+import { UserUpdatableFields } from "../link/link.dto";
 import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from "./user.dto";
 import { Prisma, User } from "@prisma/client";
 
@@ -26,7 +28,7 @@ export class UserMapper {
             isActive: dto.isActive,
         }
     }
-    static toEntityFromUpdate(dto:UserUpdateDTO): Partial<Prisma.UserUpdateInput> {
+    static toEntityFromUpdate(dto:UserUpdateDTO): Partial<UserUpdatableFields> {
         return {
             ...(dto.email !== undefined && { email: dto.email }),
             ...(dto.username !== undefined && { username: dto.username }),
@@ -34,5 +36,12 @@ export class UserMapper {
             ...(dto.membershipId !== undefined && { membershipId: dto.membershipId }),
         }
     }
+      static toEntityFromRegister(dto: RegisterDTO): Prisma.UserCreateInput {
+        return {
+          email: dto.email,
+          username: dto.username,
+          password: dto.password,
+        };
+      }
 
 }

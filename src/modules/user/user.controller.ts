@@ -52,8 +52,6 @@ export class UserController {
   async setNewPassword(req: Request, res: Response) {
     const id = IdValidator.parse(req.params.id);
     const { password } = req.body satisfies UserSetNewPasswordDTO;
-    console.log(id, password);
-    
     const user = await this.userService.setNewPassword(id, password);
     const response = ResponseHelper.success(user, "Password updated successfully"); 
     res.status(200).json(response);

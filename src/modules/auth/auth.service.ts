@@ -110,8 +110,6 @@ export class AuthService {
 
     async logout(refreshToken:string): Promise<void> {
         const savedToken = await this.authRepository.getRefreshToken(refreshToken);
-        console.log(savedToken);
-        
         if(!savedToken) throw new NotFoundError("Refresh token");
 
         const user = await this.userRepository.getById(savedToken.userId);

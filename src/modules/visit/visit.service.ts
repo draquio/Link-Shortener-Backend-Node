@@ -24,7 +24,6 @@ export class VisitService {
       await this.registerVisit(meta, shortCode);
       return cachedUrl;
     }
-
     const link = await this.linkRepository.getByShortCode(shortCode);
     if (!link) throw new NotFoundError("Shortcode");
 

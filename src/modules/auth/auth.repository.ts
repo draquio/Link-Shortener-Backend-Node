@@ -1,15 +1,13 @@
 import { prisma } from "@/config/prismaClient";
 import { TokenType } from "@prisma/client";
+import { VerificationTokenEntity } from "./auth.entity";
+import { VerificationTokenMapper } from "./auth.mapper.";
+
 
 export class AuthRepository {
-  async saveVerificationToken(
-    userId: number,
-    token: string,
-    type: TokenType,
-    expiresInMs: number
-  ) {
+  async saveVerificationToken(userId: number, token: string, type: TokenType, expiresInMs: number): Promise<VerificationTokenEntity> {
     const expirationDate = new Date(Date.now() + expiresInMs);
-    return await prisma.verificationToken.create({
+    const savedVerificationToken = await prisma.verificationToken.create({
       data: {
         userId,
         token,
@@ -18,8 +16,11 @@ export class AuthRepository {
         isUsed: false,
       },
     });
+    const TokenEntity = VerificationTokenMapper.toEntityFromPrisma(savedVerificationToken);
+    return TokenEntity;
   }
-  async saveRefreshToken(userId: number, token: string, expiresInMs: number) {
+  async saveRefreshToken(userId: number, refreshToken: string, expiresInMs: number) {
+    const token = refreshToken
     return await prisma.refreshToken.create({
       data: {
         userId,

@@ -10,5 +10,10 @@ export const ENV = {
         PORT: parseInt(process.env.EMAIL_PORT || "587", 10),
         USER: process.env.EMAIL_USER || "",
         PASS: process.env.EMAIL_PASSWORD || "",
+    },
+    REDIS: {
+        HOST: process.env.REDIS_HOST || '127.0.0.1',
+        PORT: process.env.REDIS_PORT || 6379,
+        PASSWORD: process.env.REDIS_PASSWORD || undefined,
     }
 }

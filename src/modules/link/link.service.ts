@@ -11,14 +11,14 @@ export class LinkService {
 
     async create(userId: number, linkDTO: LinkCreateDTO): Promise<LinkResponseDTO>{
         const shortCode = generateShortCode(4);
-        const linkEntity = { ...linkDTO, shortCode };
-        const link = await this.linkRepository.create(linkEntity, userId);
-        return LinkMapper.toDTO(link);
+        const linkEntity = LinkMapper.toEntityFromCreateDTO(linkDTO, userId, shortCode);
+        const link = await this.linkRepository.create(linkEntity);
+        return LinkMapper.toDTOFromEntity(link);
     }
 
     async getAll(userId: number, page:number, pageSize:number, isActive?:boolean): Promise<GetLinksAndTotal> {
         const {links, total} = await this.linkRepository.getAllByUserId(userId, page, pageSize, isActive);
-        const linksDTO = LinkMapper.toDTOList(links)
+        const linksDTO = LinkMapper.toDTOFromEntityList(links)
         return {links: linksDTO, total};
     }
 
@@ -32,8 +32,8 @@ export class LinkService {
         const link = await this.linkRepository.getById(linkId);
         if (!link) throw new NotFoundError("Link");
         if(link.userId !== userId) throw new UnauthorizedError("You do not have permission to update this link");
-        const data = LinkMapper.toUpdateEntity(linkDTO);
-        const linkUpdated = await this.linkRepository.update(linkId, data);
-        return LinkMapper.toDTO(linkUpdated);
+        const linkEntity = LinkMapper.toEntityFromUpdateDTO(linkDTO);
+        const linkUpdated = await this.linkRepository.update(linkId, linkEntity);
+        return LinkMapper.toDTOFromEntity(linkUpdated);
     }
 }

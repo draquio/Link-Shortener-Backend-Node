@@ -1,24 +1,23 @@
 import { prisma } from "@/config/prismaClient";
-import { Link, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { LinkUpdatableFields } from "./link.dto";
+import { LinkEntity } from "./link.entity";
+import { LinkMapper } from "./link.mapper";
 
 
 
 export class LinkRepository {
-  async create(data: Omit<Prisma.LinkCreateInput, "user">, userId: number) {
-    return await prisma.link.create({
-      data: {
-        ...data,
-        user: { connect: { id: userId } },
-      },
-    });
+  async create(link: LinkEntity): Promise<LinkEntity> {
+    const data = LinkMapper.toPrismaFromEntity(link)
+    const linkCreated = await prisma.link.create({data});
+    return LinkMapper.toEntityFromPrisma(linkCreated);
   }
 
-  async getByShortCode(shortCode: string) {
+  async getByShortCode(shortCode: string): Promise<LinkEntity | null> {
     return await prisma.link.findUnique({ where: { shortCode } });
   }
 
-  async getById(id: number) {
+  async getById(id: number): Promise<LinkEntity | null> {
     return await prisma.link.findUnique({ where: { id } });
   }
 
@@ -27,7 +26,7 @@ export class LinkRepository {
     page: number,
     pageSize: number,
     isActive?: boolean
-  ) {
+  ): Promise<{ links: LinkEntity[]; total: number }> {
     const whereCondition = {
       userId,
       ...(isActive !== undefined && { isActive }),
@@ -45,14 +44,14 @@ export class LinkRepository {
     return { links, total };
   }
 
-  async delete(id: number) {
-    await prisma.link.delete({ where: { id } });
+  async delete(id: number): Promise<LinkEntity> {
+    const link = await prisma.link.delete({ where: { id } });
+    const linkDeleted = LinkMapper.toEntityFromPrisma(link);
+    return linkDeleted;
   }
 
-  async update(
-    id: number,
-    data: Partial<LinkUpdatableFields>
-  ) {
-    return await prisma.link.update({ where: { id }, data });
+  async update(id: number, data: Partial<LinkUpdatableFields>): Promise<LinkEntity> {
+    const link = await prisma.link.update({ where: { id }, data });
+    return LinkMapper.toEntityFromPrisma(link);
   }
 }

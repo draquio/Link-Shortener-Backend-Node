@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { LinkCreateSchema, LinkUpdateSchema } from "./link.dto";
 import { validateBody } from "@/middlewares/validateBody.middleware";
-import { authMiddleware } from "@/middlewares/auth.Middleware";
 import { linkController } from "./link.instance";
+import { authMiddleware } from "@/middlewares/auth.middleware";
 
 const router = Router();
 

@@ -1,4 +1,4 @@
-import { Link, User } from "@prisma/client";
+import { Link } from "@prisma/client";
 import { z } from "zod";
 
 export interface LinkResponseDTO {

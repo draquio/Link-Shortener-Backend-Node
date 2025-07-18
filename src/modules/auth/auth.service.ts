@@ -28,7 +28,7 @@ export class AuthService {
 
     
     async login(data: LoginDTO): Promise<TokenResponse> {
-        const {email, password} = data;
+        const { email, password } = data;
         const user = await this.userRepository.getByEmail(email);
         const isMatch = user && await bcrypt.compare(password, user.password);
         if(!user || !user.isActive || user.isDeleted || !isMatch) {
@@ -39,22 +39,22 @@ export class AuthService {
 
         const accessToken = generateAccessToken(payload)
         const refreshToken = generateRefreshToken(payload)
-        await this.authRepository.saveRefreshToken(user.id, refreshToken, daysToVerifyToken);
+        await this.authRepository.saveRefreshToken(user.id!, refreshToken, daysToVerifyToken);
         return {accessToken, refreshToken}
     }
 
     async register(data: RegisterDTO): Promise<UserResponseDTO> {
         const hashedPassword = await hashPassword(data.password);
-        const userEntity = UserMapper.toEntityFromRegister({...data, password: hashedPassword});
+        const userEntity = UserMapper.toEntityFromDTORegister({...data, password: hashedPassword});
         const userCreated = await this.userRepository.create(userEntity);
         const payload = { userId: userCreated.id, email: userCreated.email };
-        const token = generateEmailVerificationToken(payload);
+        const emailVerificationToken = generateEmailVerificationToken(payload);
         
-        await this.authRepository.saveVerificationToken(userCreated.id, token, TokenType.EMAIL_VERIFICATION, daysToVerifyEmail);
-        const link = buildVerificationLink(token, "verify-email");
+        await this.authRepository.saveVerificationToken(userCreated.id!, emailVerificationToken, TokenType.EMAIL_VERIFICATION, daysToVerifyEmail);
+        const link = buildVerificationLink(emailVerificationToken, "verify-email");
         await this.emailService.sendVerificationEmail(userCreated.email, link);
         
-        return UserMapper.toDTO(userCreated);
+        return UserMapper.toDTOFromEntity(userCreated);
     }
 
     async verifyEmail(token:string): Promise<void>{
@@ -66,7 +66,7 @@ export class AuthService {
         if (!user) throw new NotFoundError("User");
         if (user.isActive) throw new BadRequestError("User already verified");
 
-        await this.userRepository.update(user.id, { isActive: true });
+        await this.userRepository.update(user.id!, { isActive: true });
         await this.authRepository.markTokenAsUsed(savedToken.id);
     }
 
@@ -77,7 +77,7 @@ export class AuthService {
         const link = buildVerificationLink(token, "reset-password");
         const hoursToReset = 60 * 60 * 1000; // 1 hour
         
-        await this.authRepository.saveVerificationToken(user.id, token, TokenType.RESET_PASSWORD, hoursToReset);
+        await this.authRepository.saveVerificationToken(user.id!, token, TokenType.RESET_PASSWORD, hoursToReset);
         await this.emailService.sendResetPasswordEmail(user.email, link);
     }
 
@@ -89,7 +89,7 @@ export class AuthService {
         if (!user) throw new NotFoundError("User");
 
         const hashed = await hashPassword(newPassword);
-        await this.userRepository.updatePassword(user.id, hashed);
+        await this.userRepository.updatePassword(user.id!, hashed);
         await this.authRepository.markTokenAsUsed(savedToken.id);
     }
 
@@ -104,7 +104,7 @@ export class AuthService {
         const payload = { userId: user.id, email: user.email };
         const accessToken = generateAccessToken(payload);
         const newRefreshToken = generateRefreshToken(payload);
-        await this.authRepository.saveRefreshToken(user.id, newRefreshToken, daysToVerifyToken);
+        await this.authRepository.saveRefreshToken(user.id!, newRefreshToken, daysToVerifyToken);
         return { accessToken, refreshToken: newRefreshToken };
     }
 
@@ -123,6 +123,6 @@ export class AuthService {
     async getProfile(userId: number): Promise<UserResponseDTO>{
         const user = await this.userRepository.getById(userId);
         if (!user || user.isDeleted) throw new NotFoundError("User");
-        return UserMapper.toDTO(user);
+        return UserMapper.toDTOFromEntity(user);
     }
 }
